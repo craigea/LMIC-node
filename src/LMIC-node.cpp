@@ -56,9 +56,24 @@
 //  █ █ █▀▀ █▀▀ █▀▄   █▀▀ █▀█ █▀▄ █▀▀   █▀▄ █▀▀ █▀▀ ▀█▀ █▀█
 //  █ █ ▀▀█ █▀▀ █▀▄   █   █ █ █ █ █▀▀   █▀▄ █▀▀ █ █  █  █ █
 //  ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀   ▀▀▀ ▀▀▀ ▀▀  ▀▀▀   ▀▀  ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀
+#include "EmonLib.h"                   // Include Emon Library
+#include <ESP32_LoRaWAN.h>
+#include "myWiFi.h"
+#include <SimpleDHT.h>
 
 
-const uint8_t payloadBufferLength = 4;    // Adjust to fit max payload length
+byte pinDHT22 = 23;                     // pin 13 and 23 (GPIO23) works with DHT22
+float temperature = 0;
+float humidity = 0;
+SimpleDHT22 dht22;
+
+EnergyMonitor emon1;                   // Create an instance
+double Irms;                           // global                     
+#define CT_CLAMP_PIN 36                // pin 13 and 36 work on simple loop code
+//define MQTT                            // if not defined, then wifi not used
+
+
+const uint8_t payloadBufferLength = 6;    // Adjust to fit max payload length.  2 bytes mA, 2 bytes temp, 2 bytes humidity
 
 
 //  █ █ █▀▀ █▀▀ █▀▄   █▀▀ █▀█ █▀▄ █▀▀   █▀▀ █▀█ █▀▄
@@ -728,6 +743,66 @@ void processWork(ostime_t doWorkJobTimeStamp)
 
         uint16_t counterValue = getCounterValue();
         ostime_t timestamp = os_getTime();
+        
+        // Added this throttle, so MQTT via wifi can be updated everytime and fair use policy of lorawan observed
+
+        bool allowuplink = true;
+        if (0)                                    //disabled mqtt, so allow all uplinks
+//        if (counterValue % 10)                  //allow uplink every 10 loops, do it hear before we stuff countervalue
+        {
+            allowuplink = false;
+        }
+
+//      Bad Irms readings at startup, for now strip this out.        
+//        int analogValue = analogRead(37);
+//        int analogVolts = analogReadMilliVolts(37);
+
+//      Open issue: on protoboard with heltec_wifi_lora_32_v2.  
+//      First several readings (12 @ 15 minute intervals) of Irms after powerup are high and fall
+//      nonlinear to the correct readings.
+//      Troubleshooting:
+//          1. removed above analogRead above with, no affect
+//          2. moved CT Clamp from pin 13 to 36, no affect
+//      Since device is running for months, my application can live with this; YMMV
+
+//        double Irms = emon1.calcIrms(1480);   // Calculate Irms only
+        Irms = emon1.calcIrms(1480);            // use the global Irms, so wifi module can access
+
+        dht22.read2(pinDHT22, &temperature, &humidity, NULL);
+            
+        #ifdef MQTT
+        sendmqtt();
+        #endif
+
+        //  when USE_DISPLAY defined, then LMIC code will write to display; not defined write sensor data to display        
+        #ifndef USE_DISPLAY
+        Display.clear();
+        Display.drawString(0, 0,  "mA: " + String(Irms * 1000));      //show mA
+        Display.drawString(0, 16, "CV: " + String(counterValue));   //what does CV look like 
+        Display.drawString(0, 32, "T: " + String(temperature));
+        Display.drawString(0, 48, "H: " + String(humidity));    
+        Display.display();
+        #endif
+
+        #if 0               //better for 24 font
+        Display.clear();
+        Display.drawString(0, 0,  "mA: " + String(Irms * 1000));      //show mA
+        Display.drawString(0, 20, "CV: " + String(counterValue));   //what does CV look like 
+        Display.drawString(0, 40, "T: " + String(temperature) + "H: " + String(humidity));    
+        Display.display();
+        #endif
+
+
+        //  This is lazy, should be its own variable.  Quick and dirty hack.
+        counterValue = Irms * 1000;  // keep counter going, but stuff for uplink; A no go, so try *1000 for mA
+
+        // Display.drawString(0, 30, "C mA: " + String(counterValue));   //what does CV look like 
+        // Display.drawString(0, 45, "Uplink: " + String(allowuplink));   //Uplink this loop?
+        // Display.display();
+
+        // This works
+        //        counterValue = analogVolts;  //  keep counter going, but stuff for uplink
+
 
         #ifdef USE_DISPLAY
             // Interval and Counter values are combined on a single row.
@@ -740,12 +815,32 @@ void processWork(ostime_t doWorkJobTimeStamp)
             display.print("s");        
             display.print(" Ctr:");
             display.print(counterValue);
+
+            display.clearLine(ROW_3);
+            // display.setCursor(COL_0, ROW_3);
+            // display.print(" Irms:");
+            // display.print(Irms);
+
+         //   display.print("  mV:");
+         //   display.print(analogVolts);
+
         #endif
         #ifdef USE_SERIAL
             printEvent(timestamp, "Input data collected", PrintTarget::Serial);
             printSpaces(serial, MESSAGE_INDENT);
             serial.print(F("COUNTER value: "));
             serial.println(counterValue);
+  
+         // print out the values you read:
+            printSpaces(serial, MESSAGE_INDENT);
+//            Serial.printf("ADC analog value = %d\n",analogValue);
+//            Serial.printf("ADC millivolts value = %d\n",analogVolts);
+
+            printSpaces(serial, MESSAGE_INDENT);
+            serial.print(F("Irms values: "));
+            Serial.print(Irms*230.0);	      // Apparent power
+            Serial.print(" ");
+            Serial.println(Irms);		       // Irms
         #endif    
 
         // For simplicity LMIC-node will try to send an uplink
@@ -766,11 +861,27 @@ void processWork(ostime_t doWorkJobTimeStamp)
         {
             // Prepare uplink payload.
             uint8_t fPort = 10;
-            payloadBuffer[0] = counterValue >> 8;
+            payloadBuffer[0] = counterValue >> 8;               //  counterValue was stuffed with mA
             payloadBuffer[1] = counterValue & 0xFF;
-            uint8_t payloadLength = 2;
 
-            scheduleUplink(fPort, payloadBuffer, payloadLength);
+            uint16_t itemp = temperature * 100;                 //manipulate for uplink...ugly and will fail minus degree
+            payloadBuffer[2] = itemp >> 8;
+            payloadBuffer[3] = itemp & 0xFF;
+
+            uint16_t ihum = humidity * 100;                     //manipulate for uplink...ugly
+            payloadBuffer[4] = ihum >> 8;
+            payloadBuffer[5] = ihum & 0xFF;
+
+
+            uint8_t payloadLength = 6;                          // LMIC set to 2 and ignores buffer length
+
+            // throttle uplinks, so we can push irms via wifi; probably a better way, but this works.
+            if (allowuplink)
+            {
+               scheduleUplink(fPort, payloadBuffer, payloadLength);
+            }
+            
+
         }
     }
 }    
@@ -786,17 +897,50 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
     // (e.g. from the TTN Console) with single byte value resetCmd on port cmdPort.
 
     const uint8_t cmdPort = 100;
-    const uint8_t resetCmd= 0xC0;
+//    const uint8_t resetCmd= 0xC0;
+    const uint8_t resetCmd= 0x52;     //Capital R
+    const uint8_t Uplink01Cmd= 0x4F;  //Capital O - One
+    const uint8_t Uplink30Cmd= 0x54;  //Capital T - Thirty
+    const uint8_t Uplink15Cmd= 0x46;  //Capital F - Fifteen
+    const uint8_t Uplink60Cmd= 0x53;  //Capital S - Sixty
 
-    if (fPort == cmdPort && dataLength == 1 && data[0] == resetCmd)
+    if (fPort == cmdPort && dataLength == 1 && data[0] )
     {
         #ifdef USE_SERIAL
             printSpaces(serial, MESSAGE_INDENT);
-            serial.println(F("Reset cmd received"));
+            serial.println(F("Downlink cmd received"));
         #endif
         ostime_t timestamp = os_getTime();
-        resetCounter();
-        printEvent(timestamp, "Counter reset", PrintTarget::All, false);
+
+        switch (data[0]) 
+        {
+        case resetCmd:
+            doWorkIntervalSeconds = DO_WORK_INTERVAL_SECONDS;
+            resetCounter();
+            printEvent(timestamp, "Counter reset", PrintTarget::All, false);
+            break;
+
+        case Uplink01Cmd:
+            doWorkIntervalSeconds = 60;
+            break;        
+            
+        case Uplink30Cmd:
+            doWorkIntervalSeconds = 1800;
+            break;           
+
+        case Uplink15Cmd:
+            doWorkIntervalSeconds = 900;
+            break;        
+            
+        case Uplink60Cmd:
+            doWorkIntervalSeconds = 3600;
+            break;           
+
+        default: 
+            printEvent(timestamp, "Unknown Event");    
+            break;
+        }
+
     }          
 }
 
@@ -848,6 +992,36 @@ void setup()
     // Place code for initializing sensors etc. here.
 
     resetCounter();
+    analogSetPinAttenuation(CT_CLAMP_PIN, ADC_11db);  //does this make a difference?
+    adcAttachPin(CT_CLAMP_PIN);                  // initialize pin CT PIN as ADC - maybe the below takes care of this?
+    adcAttachPin(37);                           // we can read 37 mvolts fine.
+
+//    Burden Resistor	Current Calibration Coefficient
+//15 Ω ±1% - old	133.3
+//18 Ω ±1% - shipped as standard in emonTx V2 kit	111.1
+//22 Ω ±1% - standard in emonTx V3 for CTs 1-3	90.9
+//120 Ω ±1% - standard in emonTx V3 for CT 4	16.67
+//33 Ω ±1% - shipped as standard in emonTx Shield kit	60.6
+
+    emon1.current(CT_CLAMP_PIN, 19);             // calibration with meter; 19 is right number; measured 57 ohm burden in CT013 30A/1V.
+
+
+// if LMIC not using display, then output sensor data; USE_DISPLAY=LMIC info
+    #ifndef USE_DISPLAY
+    Display.init();
+//    Display.setFont(ArialMT_Plain_24);
+    Display.setFont(ArialMT_Plain_16);
+    Display.drawString(0, 30, "Joining...");
+    Display.display();
+    #endif
+
+    #ifdef MQTT
+        setup_wifi();
+        client.setServer(mqtt_server, 1883);
+        client.setCallback(callback);
+    #endif
+
+
 
 //  █ █ █▀▀ █▀▀ █▀▄   █▀▀ █▀█ █▀▄ █▀▀   █▀▀ █▀█ █▀▄
 //  █ █ ▀▀█ █▀▀ █▀▄   █   █ █ █ █ █▀▀   █▀▀ █ █ █ █
