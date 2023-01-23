@@ -1,4 +1,4 @@
-TLDR;
+TL;DR
 
 This repository supports a production IoT sensor providing 
 
