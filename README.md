@@ -10,13 +10,13 @@ The device, Heltec WiFi LoRa 32 V2, is communicating via LoraWAN on the Helium N
 
 ## Background
 
-	The primary goal of this project is to monitor a remote pump to insure it is functioning.  Access to AC power electrical wiring is possible, which led to the exploration of a using a CT Clamp to monitor instantaneous power.  
+The primary goal of this project is to monitor a remote pump to insure it is functioning.  Access to AC power electrical wiring is possible, which led to the exploration of a using a CT Clamp to monitor instantaneous power.  
 	
-	After exploring the possible communication alternatives for monitoring a remote sensor, LoRaWAN was decided on for testing.   WLAN was not accessible and GPRS/GSM/LTE/4G/5G would be expensive.  Other methods probably exist, but were not explored.   
+After exploring the possible communication alternatives for monitoring a remote sensor, LoRaWAN was decided on for testing.   WLAN was not accessible and GPRS/GSM/LTE/4G/5G would be expensive.  Other methods probably exist, but were not explored.   
 
 ## Sensor hardware
 
-	Familiarity with the ESP8266 - NodeMCU led me to look for an ESP type sensor.  In fact the project started with the ESP8266 and later migrated to LoRaWAN on the Heltec device.  The Heltec WiFi LoRa 32 V2 is ESP32 based.   The integrated LoRaWAN hardware turned out to be an excellent choice to reduce development time, since the LoRaWAN radio and ESP are built into the development board (no wiring required).  Onboard display is also nice for troubleshooting.
+Familiarity with the ESP8266 - NodeMCU led me to look for an ESP type sensor.  In fact the project started with the ESP8266 and later migrated to LoRaWAN on the Heltec device.  The Heltec WiFi LoRa 32 V2 is ESP32 based.   The integrated LoRaWAN hardware turned out to be an excellent choice to reduce development time, since the LoRaWAN radio and ESP are built into the development board (no wiring required).  Onboard display is also nice for troubleshooting.
 
 ## LoRaWAN software
 
