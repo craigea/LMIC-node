@@ -20,25 +20,25 @@ Familiarity with the ESP8266 - NodeMCU led me to look for an ESP type sensor.  I
 
 ## LoRaWAN software
 
-	Software that easily supported existing LoRaWAN services was a bit tricky.  I first explored Heltec's proprietary code (requires a license key).  Point to point examples exist, but the sensor needs to communicate with a service provider.  The Things Network forum which led me to the base code for the project LMIC-node.
+Software that easily supported existing LoRaWAN services was a bit tricky.  I first explored Heltec's proprietary code (requires a license key).  Point to point examples exist, but the sensor needs to communicate with a service provider.  The Things Network forum which led me to the base code for the project LMIC-node.
 	
-	https://www.thethingsnetwork.org/forum/t/example-tutorial-of-connecting-a-heltec-v2-to-ttn/58930
+https://www.thethingsnetwork.org/forum/t/example-tutorial-of-connecting-a-heltec-v2-to-ttn/58930
 	
-	Later I found this excellent repository, forked from the LMIC-node code:  
+Later I found this excellent repository, forked from the LMIC-node code:  
 	
-	https://github.com/Chiumanfu/LMIC-node_Sensor-for-Helium-Network
+https://github.com/Chiumanfu/LMIC-node_Sensor-for-Helium-Network
 	
-	Full of tips and tricks for deploying on the Helium Network.  Especially useful is the example byte order for DEVEUI and APPEUI within HNT, as well as, the TagoIO integration examples.
+Full of tips and tricks for deploying on the Helium Network.  Especially useful is the example byte order for DEVEUI and APPEUI within HNT, as well as, the TagoIO integration examples.
 
 ## Open Energy Monitor and CT Clamp 
 
-	Nice write up on how to monitor energy usage.   This became the starting point for this project.
+Nice write up on how to monitor energy usage.   This became the starting point for this project.
 		
-	https://savjee.be/blog/Home-Energy-Monitor-ESP32-CT-Sensor-Emonlib/
+https://savjee.be/blog/Home-Energy-Monitor-ESP32-CT-Sensor-Emonlib/
 	
-### 	Calibration of the CT clamp is required.  Good background information here:
+### Calibration of the CT clamp is required.  Good background information here:
 	
-		https://community.openenergymonitor.org/t/calibration-and-parameters-in-emonlib/6855
+https://community.openenergymonitor.org/t/calibration-and-parameters-in-emonlib/6855
 			
-		Trial and error seemed to be the fastest way to calibrate using a volt meter with CT clamp and the sensor side by side.
+Trial and error seemed to be the fastest way to calibrate using a volt meter with CT clamp and the sensor side by side.
 
