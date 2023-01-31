@@ -8,6 +8,10 @@ Forked from https://github.com/lnlp/LMIC-node, this repository supports a produc
 	
 The device, Heltec WiFi LoRa 32 V2, is communicating via LoraWAN on the Helium Network (HNT) in the SF Bay Area, USA.  The sensor was also working on HNT and The Things Networks in Munich, Germany.  The impetus for this project was to confirm that several pumps were working at a site 9 time zones away with no access to WLAN and unreliable personnel.  Energy usage was not the goal, but the project could be expanded to include this in the future (a bit tricky due to low frequency of uplinks on LoRaWAN).  
 
+<img src="docs/img/HVAC.png" width="200">
+
+*Heltec Lora 32 monitoring HVAC blower*
+
 ## Background
 
 The primary goal of this project is to monitor a remote pump to insure it is functioning.  Access to AC power electrical wiring is possible, which led to the exploration of a using a CT Clamp to monitor instantaneous power.  
@@ -41,4 +45,8 @@ https://savjee.be/blog/Home-Energy-Monitor-ESP32-CT-Sensor-Emonlib/
 https://community.openenergymonitor.org/t/calibration-and-parameters-in-emonlib/6855
 			
 Trial and error seemed to be the fastest way to calibrate using a volt meter with CT clamp and the sensor side by side.
+
+<img src="docs/img/calibrate.png" width="200">
+
+*CT clamp calibration*
 
