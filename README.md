@@ -10,7 +10,7 @@ The device, Heltec WiFi LoRa 32 V2, is communicating via LoraWAN on the Helium N
 
 <img src="docs/img/HVAC.png" width="200">
 
-*Heltec Lora 32 monitoring HVAC blower*
+*Heltec Lora 32 monitoring HVAC blower motor*
 
 ## Background
 
