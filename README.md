@@ -40,7 +40,9 @@ Nice write up on how to monitor energy usage.   This became the starting point f
 		
 https://savjee.be/blog/Home-Energy-Monitor-ESP32-CT-Sensor-Emonlib/
 	
-### Calibration of the CT clamp is required.  Good background information here:
+### Calibration 
+
+Calibration of the CT clamp is required.  Good background information here:
 	
 https://community.openenergymonitor.org/t/calibration-and-parameters-in-emonlib/6855
 			
@@ -50,3 +52,36 @@ Trial and error seemed to be the fastest way to calibrate using a volt meter wit
 
 *CT clamp calibration*
 
+## LoRaWAN Service Provider
+
+The final location of this device is the SF Bay Area.  The Things Network (TTN) has very little coverage there.  Although TTN was tested in Munich, it was quickly abandoned in favor of HNT, which is supported widely in the Bay Area.
+	
+<img src="docs/img/TTN-BayArea-Coverage.png" width="400">
+
+*TTN Coverage Map*
+	
+	
+<img src="docs/img/HNT-BayArea-Coverage.png" width="400">
+
+*HNT Coverage Map*
+
+	
+## Sensor Data
+	
+Many ways to display the uplink data.  The HNT website has good information for various 3rd party integrations. Both Google Sheets and TagoIO integrations were implemented for this project.  TagoIO gives quick access to raw payload, hotspot name, RSSI, SNR and SF.  Tagoio.js in the payload-formatters directory works for this device.
+	
+### Google sheets
+	
+Most flexible way to show data.  HNT has a good tutorial here : [Google Sheets Tutorial](https://docs.helium.com/use-the-network/console/integrations/google-sheets/).  Live sensor data here showing pump iRMS:  [Pump iRMS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQj1dn7G-eRcmEB5HmqzgXQ_rtUPW68QRESnKMKsQ1TotCIrERJMUct81eylsNTOlBHo3MNF0EYcU-y/pubchart?oid=1019867124&amp;format=interactive).
+	
+I was also curious how many LoRaWAN uplinks were dropped, so I'm tracking time between uplinks here: [Uplink Intervals](https://docs.google.com/spreadsheets/d/e/2PACX-1vQj1dn7G-eRcmEB5HmqzgXQ_rtUPW68QRESnKMKsQ1TotCIrERJMUct81eylsNTOlBHo3MNF0EYcU-y/pubhtml?gid=776933052&amp;single=true&amp;widget=true&amp;headers=false).   In January 2023 this chart shows two power outages (one lasting 505 minutes) and 4 lost uplinks at 15 minute intervals.  On January 18th I sent a downlink command and changed to uplink interval to 30 minutes and 1 uplink was lost for the remainder of January.
+
+	
+<img src="docs/img/Lora-tx-interval.png" width="400">
+
+*Lost uplinks*
+
+	
+## Troubleshooting and notes
+	
+	
