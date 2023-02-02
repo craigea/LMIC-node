@@ -77,8 +77,7 @@ Most flexible way to show data.  HNT has a good tutorial here : [Google Sheets T
 I was also curious how many LoRaWAN uplinks were dropped, so I'm tracking time between uplinks here: [Uplink Intervals](https://docs.google.com/spreadsheets/d/e/2PACX-1vQj1dn7G-eRcmEB5HmqzgXQ_rtUPW68QRESnKMKsQ1TotCIrERJMUct81eylsNTOlBHo3MNF0EYcU-y/pubhtml?gid=776933052&amp;single=true&amp;widget=true&amp;headers=false).   In January 2023 this chart shows two power outages (one lasting 505 minutes) and 4 lost uplinks at 15 minute intervals.  On January 18th I sent a downlink command and changed to uplink interval to 30 minutes and 1 uplink was lost for the remainder of January.
 
 	
-<img src="docs/img/Lora-tx-interval.png
-" width="400">
+<img src="docs/img/Lora-tx-interval.png" width="400">
 
 *Lost uplinks*
 
