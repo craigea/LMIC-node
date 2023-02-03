@@ -16,7 +16,7 @@ The device, Heltec WiFi LoRa 32 V2, is communicating via LoraWAN on the Helium N
 
 The primary goal of this project is to monitor a remote pump to insure it is functioning.  Access to AC power electrical wiring is possible, which led to the exploration of a using a CT Clamp to monitor instantaneous power.  
 	
-After exploring the possible communication alternatives for monitoring a remote sensor, LoRaWAN was decided on for testing.   WLAN was not accessible and GPRS/GSM/LTE/4G/5G would be expensive.  Other methods probably exist, but were not explored.   
+After exploring the possible communication alternatives for monitoring a remote sensor, LoRaWAN was decided on for testing.   WLAN was not accessible and GPRS/GSM/LTE/4G/5G would be comparitively expensive.  Helium uses data credits (DC), 1 DC = 24 Byte Packet = $0.00001 USD, which equates to about $0.25 per year. Other methods probably exist, but were not explored.   
 
 ## Sensor hardware
 
@@ -54,7 +54,7 @@ Trial and error seemed to be the fastest way to calibrate using a volt meter wit
 
 ## LoRaWAN Service Provider
 
-The final location of this device is the SF Bay Area.  The Things Network (TTN) has very little coverage there.  Although TTN was tested in Munich, it was quickly abandoned in favor of HNT, which is supported widely in the Bay Area.
+The final location of this device is the SF Bay Area.  As of late 2022, The Things Network (TTN) has very little coverage in the Bay Area.  Although TTN was tested in Munich, it was quickly abandoned in favor of HNT, which is supported widely in the Bay Area.
 	
 <img src="docs/img/TTN-BayArea-Coverage.png" width="400">
 
@@ -64,6 +64,7 @@ The final location of this device is the SF Bay Area.  The Things Network (TTN) 
 <img src="docs/img/HNT-BayArea-Coverage.png" width="400">
 
 *HNT Coverage Map*
+[Explorer] (https://explorer.helium.com/)
 
 	
 ## Sensor Data
@@ -79,9 +80,41 @@ I was also curious how many LoRaWAN uplinks were dropped, so I'm tracking time b
 	
 <img src="docs/img/Lora-tx-interval.png" width="400">
 
-*Lost uplinks*
+*Lost uplinks and power outages*
 
-	
 ## Troubleshooting and notes
 	
+	
+### CT Clamp
+
+- Best to start with known power, ie 1500 watt hair dryer, 800 watt microwave
+- Calibration with emonlib is critical; The SCT 013-030 has a built in burden resistor measured to be 58 ohm
+- Only clamp one AC leg
+
+### LoRaWAN
+
+#### Antenna 
+Different antenna required for EU and US.   Best position for LoRaWAN is veritical.
+- EU - 868 Mhz
+- US - 915 Mhz
+
+When device is behind barriers it will take longer to join network; assume LMIC code starts at SF7 and adjusts toward SF12.  In Munich the breaker panel was located in the middle of the building resulting in a SF11 at join after a long time (30+ minutes).  When testing near a window the join was immediate at SF7.
+
+#### Helium Network - Staging vs Production
+
+Staging worked flawlessly in Munich for 2 months and several days in US.  Within 3 hours of final placement in the US, staging stop working for several days. Recommend purchasing DC credits (minimal cost) and get on production console early to avoid headaches.
+
+- [Staging] (https://staging-console.helium.wtf/)
+
+- [Production] https://console.helium.com/)
+
+#### Other 
+- [TTN LoRaWAN intro] (https://www.thethingsnetwork.org/docs/lorawan/)
+- [LoRaWAN Utilization] (https://www.r-bloggers.com/2022/03/data-science-on-blockchain-with-r-part-iii-helium-based-iot-is-taking-the-world/)
+
+### Off the shelf products
+	
+- [Netvox] (http://www.netvox.com.tw/product.asp?pro=R718N17#) (120 euro)
+- [Watteco] (https://www.watteco.com/product/intenso-sensor-lorawan/)
+- [Sense] (https://sense.com/) (power monitor; not LoRaWAN)
 	
