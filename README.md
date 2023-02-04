@@ -1,4 +1,4 @@
-# LoRaWAN Sensor with Instantaneous Power on Heltec Wifi Lora 32 v2 board
+# Instantaneous Power LoRaWAN Sensor on Heltec Wifi Lora 32 v2
 
 Forked from https://github.com/lnlp/LMIC-node, this repository supports a production IoT sensor providing 
 
