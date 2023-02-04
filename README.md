@@ -1,4 +1,4 @@
-# TL;DR
+# LoRaWAN Sensor with Instantaneous Power on Heltec Wifi Lora 32 v2 board
 
 Forked from https://github.com/lnlp/LMIC-node, this repository supports a production IoT sensor providing 
 
@@ -117,4 +117,8 @@ Staging worked flawlessly in Munich for 2 months and several days in US.  Within
 - [Netvox] (http://www.netvox.com.tw/product.asp?pro=R718N17#) (120 euro)
 - [Watteco] (https://www.watteco.com/product/intenso-sensor-lorawan/)
 - [Sense] (https://sense.com/) (power monitor; not LoRaWAN)
+
+#### Know Issues
+- [Open] (https://github.com/craigea/lorawan-heltec-sensor/issues/1)
+
 	
