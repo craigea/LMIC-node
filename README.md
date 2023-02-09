@@ -121,7 +121,7 @@ When device is behind barriers it will take longer to join network; assume LMIC 
 
 #### 7.2.2. Helium Network - Staging vs Production
 
-Staging worked flawlessly in Munich for 2 months and several days in US.  Within 3 hours of final placement in the US, staging stop working for several days. Recommend purchasing DC credits (minimal cost) and get on production console early to avoid headaches.
+Staging worked flawlessly in Munich for 2 months and several days in US.  Within 3 hours of final placement in the US, staging stopped working for several days. Recommend purchasing DC credits (minimal cost) and get on production console early to avoid headaches.
 
 - [Staging] (https://staging-console.helium.wtf/)
 
